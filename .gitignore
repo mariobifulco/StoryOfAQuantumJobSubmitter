@@ -1,0 +1,5 @@
+.quarto
+_old
+.venv
+.env
+.DS_Store
