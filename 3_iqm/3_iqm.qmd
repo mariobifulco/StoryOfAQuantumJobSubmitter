@@ -1,0 +1,122 @@
+---
+title: "Running on IQM"
+format:
+  revealjs:
+    theme: sky
+    self-contained: true 
+    incremental: true
+    slide-number: true
+    preview-links: auto
+    code-line-numbers: true
+---
+
+## What is IQM?
+
+[IQM Quantum Computers](https://www.meetiqm.com/) is a European QPU manufacturer
+
+- Superconducting qubit architecture, like IBM, but different gate set and topology
+- Access via **IQM Resonance**
+- Qiskit-compatible
+
+---
+
+## Getting a Token
+
+To access IQM Resonance you need an account and an API token:
+
+1. Register at <https://resonance.meetiqm.com/>
+2. Log in and navigate to **API Tokens** in your profile
+
+```{python}
+#| echo: false
+#| eval: true
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+token = os.getenv("IQM_TOKEN")
+```
+
+---
+
+## Reusing Our Bell State Circuit
+
+```{python}
+#| echo: true
+#| eval: true
+#| fig-align: center
+from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(2)
+qc.h(0)
+qc.cx(0, 1)
+qc.measure_all()
+qc.draw("mpl")
+```
+
+---
+
+## Connecting to IQM Resonance
+
+```{python}
+#| echo: true
+#| eval: true
+from iqm.qiskit_iqm import IQMProvider
+
+provider = IQMProvider(
+    url="https://resonance.meetiqm.com/",
+    # token=token,
+    quantum_computer="garnet"
+)
+backend = provider.get_backend()
+```
+
+---
+
+## Transpiling for IQM Hardware
+
+```{python}
+#| echo: true
+#| eval: true
+#| fig-align: center
+from iqm.qiskit_iqm import transpile_to_IQM
+
+isa_circuit = transpile_to_IQM(qc, backend)
+isa_circuit.draw("mpl")
+```
+
+---
+
+## Submitting the Job
+
+The submission pattern is identical to IBM, just swap the backend:
+
+```{python}
+#| echo: true
+#| eval: true
+from qiskit_ibm_runtime import SamplerV2
+
+sampler = SamplerV2(mode=backend)
+job = sampler.run([isa_circuit], shots=1024)
+
+print(f"Job ID: {job.job_id()}")
+```
+
+---
+
+## Retrieving & Visualizing Results
+
+```{python}
+#| echo: true
+#| eval: true
+result  = job.result()[0]
+counts  = result.data.meas.get_counts()
+print(counts)
+```
+
+---
+
+## Next Step
+
+[Alternative simulation on BlueQubit](4_bluequbit.html)

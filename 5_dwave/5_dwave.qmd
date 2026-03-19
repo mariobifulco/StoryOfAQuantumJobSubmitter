@@ -1,0 +1,109 @@
+---
+title: "Running on DWave"
+format:
+  revealjs:
+    theme: sky
+    self-contained: true 
+    incremental: true
+    slide-number: true
+    preview-links: auto
+    code-line-numbers: true
+---
+
+## A Different Paradigm
+
+So far: **gate-based** quantum computers (IBM, IQM, BlueQubit)
+
+. . .
+
+D-Wave is a **quantum annealer**, a fundamentally different architecture
+
+. . .
+
+> Think of it as a physical system that naturally falls into its lowest-energy state, which encodes the optimal solution
+
+---
+
+## Annealing VS Gates
+
+| | Gate-based | Quantum Annealing |
+|---|---|---|
+| Unit | Qubit + gates | Qubit + couplers |
+| Goal | General purpose | Energy minimization |
+| Problem type | Circuits | Optimization |
+| Analogy | Universal CPU | Co-processor |
+
+
+---
+
+## What Problems Can It Solve?
+
+D-Wave minimizes **quadratic polynomials** over binary variables (QUBO):
+
+$$E(\mathbf{x}) = \sum_i a_i x_i + \sum_{i < j} b_{ij} x_i x_j \qquad x_i \in \{0, 1\}$$
+
+. . .
+
+Real-world problems that map naturally to QUBO:
+
+- Portfolio optimization
+- Vehicle routing
+- Scheduling
+
+---
+
+## The Knapsack Problem
+
+Given a set of items with **weights** and **values**, choose which to pack
+to **maximize total value** without exceeding capacity
+
+$$\max \sum_i v_i x_i \quad \text{s.t.} \quad \sum_i w_i x_i \leq C, \quad x_i \in \{0,1\}$$
+
+## Create a Knapsack problem
+
+```{python}
+#| echo: true
+#| eval: true
+import dimod
+from dimod.generators import random_knapsack
+
+cqm = random_knapsack(num_items=3, seed=42)
+print(dimod.lp.dumps(cqm))
+bqm, inverter = dimod.cqm_to_bqm(cqm)
+qubo, offset = bqm.to_qubo()
+```
+
+---
+
+## Solving Locally: Simulated Annealing
+
+```{python}
+#| echo: true
+#| eval: true
+from dwave.samplers import SimulatedAnnealingSampler
+
+sampler = SimulatedAnnealingSampler()
+sampleset = sampler.sample_qubo(qubo, num_reads=50)
+```
+
+. . .
+
+`num_reads` controls how many independent annealing runs to perform
+
+The lowest-energy sample is the best candidate solution
+
+---
+
+## Reading the Results
+```{python}
+#| echo: true
+#| eval: true
+best = inverter(sampleset.first.sample)
+
+print(f"Selected items : {[k for k,v in best.items() if v == 1]}")
+```
+
+## Next Step
+
+* [MCMR via Quantinuum](6_quantinuum.html)
+* [Too late](7_outro.html)

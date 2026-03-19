@@ -1,0 +1,95 @@
+---
+title: "Running on BlueQubit"
+format:
+  revealjs:
+    theme: sky
+    self-contained: true 
+    incremental: true
+    slide-number: true
+    preview-links: auto
+    code-line-numbers: true
+---
+
+## What is BlueQubit?
+
+[BlueQubit](https://www.bluequbit.io/) is a cloud platform for **high-performance quantum simulation**
+
+- No real QPU*
+- Supports up to 34 qubits (CPU)
+- Free tier available, no credit card needed
+
+---
+
+
+## Getting a Token
+
+1. Register at <https://app.bluequbit.io>
+2. Copy your **API Token** from the dashboard
+
+```{python}
+#| echo: false
+#| eval: true
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+token = os.getenv("BLUEQUBIT_TOKEN")
+```
+
+---
+
+## Bluequbit SDK
+
+The SDK accepts **Qiskit** and **Cirq** circuits directly, no transpilation step required
+
+```{python}
+#| echo: true
+#| eval: true
+#| fig-align: center
+from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(2)
+qc.h(0)
+qc.cx(0, 1)
+qc.measure_all()
+qc.draw("mpl")
+```
+
+---
+
+## Connecting and Running
+
+```{python}
+#| echo: true
+#| eval: true
+import bluequbit
+
+bq_client = bluequbit.init(token)
+result = bq_client.run(qc, job_name="bell_state")
+counts = result.get_counts()
+print(counts)
+```
+
+. . .
+
+`bq_client.run()` is **synchronous by default**, it blocks until the result is ready
+
+---
+
+## Choosing the Simulation Device
+
+| Device | Method | Max qubits |
+|---|---|---|
+| `cpu` | Statevector | 34 |
+| `mps.cpu` | Matrix Product State | 96 |
+| `pauli-path.cpu` | Pauli propagation | 192 |
+
+. . .
+
+Note: `cpu` jobs can run up to 60 minutes. `mps.cpu` and `pauli-path.cpu` jobs can run up to 15 minutes
+
+## Next Step
+
+* [Quantum optimization via D-Wave](5_dwave.html)
+* [MCMR via Quantinuum](6_quantinuum.html)
+* [Too late](7_outro.html)

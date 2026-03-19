@@ -1,0 +1,70 @@
+---
+title: "The End"
+format:
+  revealjs:
+    theme: sky
+    self-contained: true 
+    incremental: true
+    slide-number: true
+    preview-links: auto
+    code-line-numbers: true
+---
+
+## What We Covered
+
+| Backend | Paradigm |
+|---|---|
+| Qiskit Aer | Local gate-based simulation |
+| BlueQubit | Cloud gate-based simulation |
+| IQM Resonance | Gate-based QPU |
+| IBM Quantum | Gate-based QPU |
+| D-Wave Leap | Quantum annealing |
+| Quantinuum Guppy | MCMR |
+
+---
+
+## Choosing the Right Backend
+
+| Goal | Backend | Why |
+|---|---|---|
+| Simulation | Qiskit Aer | Free, local, no queue |
+| Simulation | BlueQubit | Scale-up |
+| Optimization | D-Wave | Ad hoc system |
+| European QPU | IQM | Sovereignty |
+| Largest QPUs | IBM | 150+ qubit systems |
+| Extend gate | Quantinuum | Native MCMR support |
+
+. . .
+
+There is no single best platform
+
+---
+
+## The Quantum Stack
+
+```
+Your algorithm
+      │
+  SDK / IR  <-- Qiskit, Ocean, Guppy
+      │
+Transpiler  <-- gate decomposition, minor embedding
+      │
+ Hardware   <-- Gate QPU, Annealer, Simulator
+```
+
+. . .
+
+The abstraction layers are the same as classical computing,
+what changes is the physics underneath
+
+---
+
+## Thank You
+
+::: {layout-ncol=1 style="text-align: center;"}
+
+![](qr-code.png){width="300px"}
+
+Questions? [mario.bifulco@unito.it](mailto:mario.bifulco@unito.it)
+
+:::

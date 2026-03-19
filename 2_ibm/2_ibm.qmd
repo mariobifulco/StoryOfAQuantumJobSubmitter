@@ -1,0 +1,137 @@
+---
+title: "Running on IBM"
+subtitle: "From Local Simulation to the Cloud"
+format:
+  revealjs: 
+    theme: sky
+    self-contained: true
+    incremental: true
+    slide-number: true
+    preview-links: auto
+    code-line-numbers: true
+---
+
+## Transitioning to Execution
+
+Now that we have our circuit (Bell State), we need to decide **where** to run it
+
+1.  **Local Simulation:** Free, Fast*
+2.  **Real Hardware:** Access via IBM Cloud Quantum Services
+
+```{python}
+#| echo: false
+#| eval: true
+from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(2)
+qc.h(0)
+qc.cx(0, 1)
+qc.measure_all()
+```
+
+---
+
+## Local Simulation: Qiskit Aer
+
+The `qiskit-aer` package provides high-performance simulators for Qiskit workflows
+
+```{python}
+#| echo: true
+#| eval: true
+from qiskit_aer import AerSimulator
+
+simulator = AerSimulator() # noiseless
+result = simulator.run(qc).result()
+counts = result.get_counts()
+print(f"Results: {counts}")
+```
+
+---
+
+## Choosing the Simulation Method
+
+Depending on the circuit structure, we can optimize the simulation engine (`AerSimulator(method="...")`):
+
+1. statevector -> Small circuits, exact state calculation
+2. matrix_product_state -> Shallow circuits with limited entanglement
+3. tensor_network -> Large, structured, or "sparse" circuits
+
+. . .
+
+Tip: You can leverage GPU acceleration by setting device='GPU' if your hardware supports CUDA
+
+---
+
+## Accessing the IBM Portal
+
+To touch real hardware, you need a token:
+
+- Register at <https://quantum.cloud.ibm.com/>
+- Copy your API Token and the CRN
+- Save your credentials locally:
+
+. . .
+
+```{python}
+#| echo: false
+#| eval: true
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+token = os.getenv("IBM_TOKEN")
+crn = os.getenv("IBM_CRN")
+```
+
+```{python}
+#| eval: true
+#| echo: true
+from qiskit_ibm_runtime import QiskitRuntimeService
+
+QiskitRuntimeService.save_account(token=token, 
+                                  instance=crn, 
+                                  overwrite=True)
+```
+
+---
+
+## Transpile circuit
+
+```{python}
+#| eval: true
+#| echo: true
+#| fig-align: center
+from qiskit.transpiler.preset_passmanagers import (
+  generate_preset_pass_manager)
+from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2
+
+service = QiskitRuntimeService()
+backend = service.least_busy(operational=True)
+pm = generate_preset_pass_manager(optimization_level=0, backend=backend)
+isa_circuit = pm.run(qc)
+isa_circuit.draw("mpl")
+```
+
+---
+
+## Execution
+
+```{python}
+#| echo: true
+#| eval: true
+sampler = SamplerV2(mode=backend)
+job = sampler.run([isa_circuit])
+result = job.result()[0]
+counts = result.data.meas.get_counts()
+print(counts)
+```
+
+. . .
+
+Note: It's not 50/50 for 00 and 11
+
+---
+
+## Next step
+
+[Run on IQM](3_iqm.html)

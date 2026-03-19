@@ -1,0 +1,15 @@
+[project]
+name = "02-ibm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "pylatexenc>=2.10",
+    "python-dotenv>=1.2.2",
+    "qiskit>=2.3.1",
+    "qiskit-aer>=0.17.2",
+    "qiskit-ibm-runtime>=0.45.1",
+]

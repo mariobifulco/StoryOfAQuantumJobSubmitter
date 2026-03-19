@@ -1,0 +1,52 @@
+---
+title: "The Quantum Job Submitter"
+format:
+  revealjs:
+    theme: sky
+    self-contained: true 
+    incremental: true
+    slide-number: true
+    preview-links: auto
+    code-line-numbers: true
+---
+
+## About Me
+
+- Mario Bifulco `mario.bifulco@unito.it`
+- PhD student in Computer Science
+- Main interest: Quantum Optimization
+
+---
+
+## What This Seminar Is About
+
+**Goal**
+
+Build a quantum *job submitter*
+
+. . .
+
+> *"The best way to understand a quantum computer is to program one."*
+
+---
+
+## Quantum "Hello World"
+
+```{python}
+#| echo: true
+#| eval: true
+#| fig-align: center
+from qiskit import QuantumCircuit
+
+qc = QuantumCircuit(2)
+qc.h(0)
+qc.cx(0, 1)
+qc.measure_all()
+qc.draw('mpl') # Draw Bell state
+```
+
+---
+
+## Next step
+
+[Run on IBM](2_ibm.html)

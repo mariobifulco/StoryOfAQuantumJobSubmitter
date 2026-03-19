@@ -1,0 +1,14 @@
+[project]
+name = "03-iqm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "iqm-client[qiskit]>=33.0.5",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "nbformat>=5.10.4",
+    "pylatexenc>=2.10",
+    "qiskit-ibm-runtime>=0.45.1",
+]

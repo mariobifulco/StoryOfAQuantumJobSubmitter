@@ -1,0 +1,120 @@
+---
+title: "Running on Quantinuum"
+format:
+  revealjs:
+    theme: sky
+    self-contained: true 
+    incremental: true
+    slide-number: true
+    preview-links: auto
+    code-line-numbers: true
+---
+
+## Beyond Gate-Based Circuits
+
+So far, our circuits have been **static**: gates are fixed before execution
+
+. . .
+
+Quantinuum's hardware supports **Mid-Circuit Measurement and Reset (MCMR)**:
+
+- Measure a qubit **in the middle** of a circuit
+- **Reset** it and reuse it, or
+- **Branch** on the result with classical `if/else`
+
+---
+
+## Enter Guppy
+
+[Guppy](https://docs.quantinuum.com/guppy/) is Quantinuum's **quantum-first programming language**
+
+. . .
+
+Full quantum measurement-dependent control flow: write `if`/`else`, `for`, and `while` loops, all in Python style
+
+. . .
+
+Circuits are written as **Python functions** decorated with `@guppy`
+
+The compiler type-checks the quantum logic before running anything
+
+---
+
+## A Minimal MCMR Circuit
+
+```{python}
+#| echo: true
+#| eval: true
+from guppylang import guppy
+from guppylang.std.builtins import result
+from guppylang.std.quantum import cx, h, measure, qubit, x
+
+@guppy
+def simple_circuit() -> qubit:
+    q1, q2 = qubit(), qubit()
+    h(q1)
+    cx(q1, q2)
+    outcome = measure(q1)       
+    result("q1", outcome)       
+    if outcome:
+        x(q2)                   
+    return q2
+
+simple_circuit.check()          
+```
+
+. . .
+
+`measure(q1)` consumes `q1`, the qubit is gone after measurement
+
+---
+
+## Running the Emulator
+
+```{python}
+#| echo: true
+#| eval: true
+@guppy
+def evaluate() -> None:
+    q = simple_circuit()
+    result("q2", measure(q))
+
+emulator = (
+    evaluate.emulator(n_qubits=2)
+    .stabilizer_sim()
+    .with_seed(42)
+    .with_shots(1000)
+)
+
+shots = emulator.run()
+```
+
+---
+
+## Reading the Results
+
+```{python}
+#| echo: true
+#| eval: true
+from collections import Counter
+
+counts = Counter()
+for shot in shots.results:
+    d = shot.as_dict()
+    outcome = f"q1={int(d['q1'])} q2={int(d['q2'])}"
+    counts[outcome] += 1
+
+for outcome, n in sorted(counts.items()):
+    print(f"  {outcome}  ->  {n} shots")
+```
+
+. . .
+
+`q2` is **always 0**, the feed-forward `x(q2)` corrected it every time `q1` was 1
+
+---
+
+## Next Step
+
+* [Quantum optimization via D-Wave](5_dwave.html)
+* [Too late](7_outro.html)
