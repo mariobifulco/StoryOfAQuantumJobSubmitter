@@ -18,6 +18,25 @@ format:
 
 ---
 
+## Roadmap
+
+:::: {.columns}
+::: {.column width="50%"}
+1. [IBM](2_ibm.html)
+2. [IQM](3_iqm.html)
+3. [BlueQubit](4_bluequbit.html)
+4. [DWave](5_dwave.html)
+5. [Quantinuum](6_quantinuum.html)
+6. [End](7_outro.html)
+:::
+
+::: {.column width="50%"}
+![](qr-code.png){width="300px"}
+:::
+::::
+
+---
+
 ## What This Seminar Is About
 
 **Goal**
